@@ -91,7 +91,8 @@ final todayRecordProvider = StateNotifierProvider<TodayRecordNotifier, PrayerRec
 
 final historyRecordsProvider = Provider<List<PrayerRecord>>((ref) {
   final hiveService = ref.watch(hiveServiceProvider);
-  // We trigger a watch on todayRecordProvider so that the history updates if today's record changes
-  ref.watch(todayRecordProvider);
-  return hiveService.getAllRecords();
+  final todayRecord = ref.watch(todayRecordProvider);
+  
+  final allRecords = hiveService.getAllRecords();
+  return allRecords.where((record) => record.id != todayRecord.id).toList();
 });
