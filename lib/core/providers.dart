@@ -3,6 +3,8 @@ import 'package:shared_preferences/shared_preferences.dart';
 import '../services/storage_service.dart';
 import '../services/hive_service.dart';
 import '../services/mock_prayer_service.dart';
+import '../services/location_service.dart';
+import '../services/real_prayer_service.dart';
 import '../models/prayer.dart';
 
 // Providers for services
@@ -20,6 +22,14 @@ final hiveServiceProvider = Provider<HiveService>((ref) {
 
 final mockPrayerServiceProvider = Provider<MockPrayerService>((ref) {
   return MockPrayerService();
+});
+
+final locationServiceProvider = Provider<LocationService>((ref) {
+  return LocationService();
+});
+
+final realPrayerServiceProvider = Provider<RealPrayerService>((ref) {
+  return RealPrayerService();
 });
 
 // State Notifiers
@@ -54,8 +64,25 @@ final languageProvider = StateNotifierProvider<LanguageNotifier, String>((ref) {
 });
 
 // Providers for prayer data
-final dailyPrayersProvider = Provider<List<Prayer>>((ref) {
-  return ref.watch(mockPrayerServiceProvider).getDailyPrayers();
+final dailyPrayersProvider = FutureProvider<List<Prayer>>((ref) async {
+  final locationService = ref.watch(locationServiceProvider);
+  final realPrayerService = ref.watch(realPrayerServiceProvider);
+  final mockService = ref.watch(mockPrayerServiceProvider);
+
+  final locationResult = await locationService.getCurrentLocation();
+  
+  if (locationResult.isSuccess && locationResult.latitude != null && locationResult.longitude != null) {
+    try {
+      return realPrayerService.calculatePrayers(locationResult.latitude!, locationResult.longitude!);
+    } catch (e) {
+      throw Exception('Unable to get prayer times');
+    }
+  } else {
+    // We throw an exception if location fails so the UI can show the error state.
+    // If we wanted to fallback to mock on error, we could return mockService.getDailyPrayers() here.
+    // However, the spec says: "If location or prayer calculation fails, show a simple error state: Unable to get prayer times"
+    throw Exception('Unable to get prayer times\n${locationResult.errorMessage ?? ""}');
+  }
 });
 
 class TodayRecordNotifier extends StateNotifier<PrayerRecord> {

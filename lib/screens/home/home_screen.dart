@@ -56,38 +56,64 @@ class HomeScreen extends ConsumerWidget {
               ),
             ),
             Expanded(
-              child: ListView.builder(
-                itemCount: dailyPrayers.length,
-                itemBuilder: (context, index) {
-                  final prayer = dailyPrayers[index];
-                  bool isCompleted = false;
+              child: dailyPrayers.when(
+                data: (prayers) {
+                  return ListView.builder(
+                    itemCount: prayers.length,
+                    itemBuilder: (context, index) {
+                      final prayer = prayers[index];
+                      bool isCompleted = false;
 
-                  switch (prayer.type) {
-                    case PrayerType.fajr:
-                      isCompleted = todayRecord.isFajrCompleted;
-                      break;
-                    case PrayerType.dhuhr:
-                      isCompleted = todayRecord.isDhuhrCompleted;
-                      break;
-                    case PrayerType.asr:
-                      isCompleted = todayRecord.isAsrCompleted;
-                      break;
-                    case PrayerType.maghrib:
-                      isCompleted = todayRecord.isMaghribCompleted;
-                      break;
-                    case PrayerType.isha:
-                      isCompleted = todayRecord.isIshaCompleted;
-                      break;
-                  }
+                      switch (prayer.type) {
+                        case PrayerType.fajr:
+                          isCompleted = todayRecord.isFajrCompleted;
+                          break;
+                        case PrayerType.dhuhr:
+                          isCompleted = todayRecord.isDhuhrCompleted;
+                          break;
+                        case PrayerType.asr:
+                          isCompleted = todayRecord.isAsrCompleted;
+                          break;
+                        case PrayerType.maghrib:
+                          isCompleted = todayRecord.isMaghribCompleted;
+                          break;
+                        case PrayerType.isha:
+                          isCompleted = todayRecord.isIshaCompleted;
+                          break;
+                      }
 
-                  return PrayerCard(
-                    prayer: prayer,
-                    isCompleted: isCompleted,
-                    onTap: () {
-                      ref.read(todayRecordProvider.notifier).togglePrayer(prayer.type);
+                      return PrayerCard(
+                        prayer: prayer,
+                        isCompleted: isCompleted,
+                        onTap: () {
+                          ref.read(todayRecordProvider.notifier).togglePrayer(prayer.type);
+                        },
+                      );
                     },
                   );
                 },
+                loading: () => const Center(child: CircularProgressIndicator()),
+                error: (err, stack) => Center(
+                  child: Column(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      Text(
+                        'Unable to get prayer times',
+                        style: TextStyle(
+                          fontSize: 16,
+                          color: Theme.of(context).colorScheme.error,
+                        ),
+                      ),
+                      const SizedBox(height: 16),
+                      ElevatedButton(
+                        onPressed: () {
+                          ref.invalidate(dailyPrayersProvider);
+                        },
+                        child: const Text('Try again'),
+                      ),
+                    ],
+                  ),
+                ),
               ),
             ),
           ],
