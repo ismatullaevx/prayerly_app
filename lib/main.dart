@@ -8,6 +8,7 @@ import 'core/providers.dart';
 import 'core/localization/app_localizations.dart';
 import 'screens/main_screen.dart';
 import 'services/hive_service.dart';
+import 'services/notification_service.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -22,11 +23,17 @@ void main() async {
   final hiveService = HiveService();
   await hiveService.init();
 
+  // Initialize Notifications
+  final notificationService = NotificationService();
+  await notificationService.init();
+  await notificationService.requestPermissions();
+
   runApp(
     ProviderScope(
       overrides: [
         sharedPreferencesProvider.overrideWithValue(sharedPreferences),
         hiveServiceProvider.overrideWithValue(hiveService),
+        notificationServiceProvider.overrideWithValue(notificationService),
       ],
       child: const PrayerlyApp(),
     ),
@@ -40,6 +47,9 @@ class PrayerlyApp extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final themeString = ref.watch(themeProvider);
     final languageString = ref.watch(languageProvider);
+
+    // Keep the scheduler alive
+    ref.listen(notificationSchedulerProvider, (_, __) {});
 
     ThemeMode themeMode;
     switch (themeString) {
