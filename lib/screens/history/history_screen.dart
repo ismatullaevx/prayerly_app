@@ -19,59 +19,57 @@ class HistoryScreen extends ConsumerWidget {
         centerTitle: true,
       ),
       body: historyRecords.isEmpty
-          ? Center(
+          ? const Center(
               child: Text(
                 'No history available',
                 style: TextStyle(color: Colors.grey),
               ),
             )
           : ListView.builder(
+              padding: const EdgeInsets.symmetric(horizontal: 24.0, vertical: 16.0),
               itemCount: historyRecords.length,
               itemBuilder: (context, index) {
                 final record = historyRecords[index];
-                return Card(
-                  margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-                  child: Padding(
-                    padding: const EdgeInsets.all(16.0),
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Text(
-                          DateFormat.MMMMd(locale).format(record.date),
-                          style: const TextStyle(
-                            fontSize: 18,
-                            fontWeight: FontWeight.bold,
-                          ),
-                        ),
-                        const SizedBox(height: 12),
-                        _buildPrayerHistoryRow(loc.get('fajr'), record.isFajrCompleted, context),
-                        _buildPrayerHistoryRow(loc.get('dhuhr'), record.isDhuhrCompleted, context),
-                        _buildPrayerHistoryRow(loc.get('asr'), record.isAsrCompleted, context),
-                        _buildPrayerHistoryRow(loc.get('maghrib'), record.isMaghribCompleted, context),
-                        _buildPrayerHistoryRow(loc.get('isha'), record.isIshaCompleted, context),
-                      ],
+                
+                int completedCount = 0;
+                if (record.isFajrCompleted) completedCount++;
+                if (record.isDhuhrCompleted) completedCount++;
+                if (record.isAsrCompleted) completedCount++;
+                if (record.isMaghribCompleted) completedCount++;
+                if (record.isIshaCompleted) completedCount++;
+
+                return Container(
+                  padding: const EdgeInsets.symmetric(vertical: 16.0),
+                  decoration: BoxDecoration(
+                    border: Border(
+                      bottom: BorderSide(color: Colors.grey.withOpacity(0.2)),
                     ),
+                  ),
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      Text(
+                        DateFormat.MMMMd(locale).format(record.date),
+                        style: const TextStyle(
+                          fontSize: 16,
+                          fontWeight: FontWeight.w500,
+                        ),
+                      ),
+                      Text(
+                        '$completedCount / 5',
+                        style: TextStyle(
+                          fontSize: 16,
+                          fontWeight: FontWeight.w600,
+                          color: completedCount == 5 
+                              ? Theme.of(context).primaryColor 
+                              : Colors.grey.shade600,
+                        ),
+                      ),
+                    ],
                   ),
                 );
               },
             ),
-    );
-  }
-
-  Widget _buildPrayerHistoryRow(String name, bool isCompleted, BuildContext context) {
-    return Padding(
-      padding: const EdgeInsets.symmetric(vertical: 4.0),
-      child: Row(
-        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-        children: [
-          Text(name, style: const TextStyle(fontSize: 16)),
-          Icon(
-            isCompleted ? Icons.check_circle : Icons.radio_button_unchecked,
-            color: isCompleted ? Theme.of(context).primaryColor : Colors.grey,
-            size: 20,
-          ),
-        ],
-      ),
     );
   }
 }

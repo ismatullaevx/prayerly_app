@@ -16,17 +16,17 @@ class RealPrayerService {
           method = adhan.CalculationMethod.karachi;
           break;
         case 'umm_al_qura':
-          method = adhan.CalculationMethod.ummAlQura;
+          method = adhan.CalculationMethod.umm_al_qura;
           break;
         case 'dubai':
           method = adhan.CalculationMethod.dubai;
           break;
         case 'moonsighting_committee':
-          method = adhan.CalculationMethod.moonSightingCommittee;
+          method = adhan.CalculationMethod.moonsighting_committee;
           break;
         case 'muslim_world_league':
         default:
-          method = adhan.CalculationMethod.muslimWorldLeague;
+          method = adhan.CalculationMethod.muslim_world_league;
           break;
       }
       final params = method.getParameters();

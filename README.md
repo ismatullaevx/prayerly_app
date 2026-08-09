@@ -1,54 +1,58 @@
 # Prayerly
 
-Prayerly is a modern Islamic application designed to help Muslims around the world maintain their daily prayers (Salah) with ease and precision.
+Prayerly is a simple, beautiful, and localized Flutter application for tracking daily Islamic prayers. It focuses on privacy, simplicity, and core functionalities without ads, cloud sync, or unnecessary complexities.
 
-## 🎯 Key Features
+## Features
+- **Real Prayer Times**: Calculates precise daily prayer times using geolocation and standard calculation methods.
+- **Local Notifications**: Automatic, offline alerts for every prayer, generated via `flutter_local_notifications`.
+- **Prayer Tracking**: Tap to check off completed prayers. Data is stored securely offline using Hive.
+- **Themes**: Soft Light and Dark themes that automatically follow system settings.
+- **Localization**: Supports English and Russian.
+- **Onboarding**: A clean, single-screen onboarding flow requesting necessary permissions gracefully.
 
-- **Accurate Prayer Times**: Uses advanced algorithms and your location to provide precise prayer time calculations (Fajr, Dhuhr, Asr, Maghrib, Isha).
-- **Qibla Direction**: Compass feature to find the exact direction of the Kaaba.
-- **Islamic Calendar**: Integrated Hijri calendar.
-- **Adhan Notifications**: Get timely notifications for prayer times with customizable sounds.
-- **Local Storage**: Uses Hive for fast and efficient local data management.
-- **Intuitive UI**: Clean, modern, and easy-to-navigate user interface.
+## Tech Stack
+- Flutter & Dart
+- **State Management**: Riverpod (`flutter_riverpod`)
+- **Persistence**: Hive (for daily records) & SharedPreferences (for simple settings)
+- **Notifications**: `flutter_local_notifications`
+- **Location**: `geolocator` & `geocoding`
+- **Prayer Calculations**: `adhan`
 
-## 🚀 Getting Started
+## Project Structure
+- `lib/core/` - Global providers, themes, and localization logic.
+- `lib/models/` - Data models (Prayer, PrayerRecord, etc.).
+- `lib/screens/` - UI screens (Home, History, Settings, Onboarding).
+- `lib/services/` - Background services like Hive caching and Notifications.
+- `lib/widgets/` - Reusable UI components.
 
-### Prerequisites
+## Setup Instructions
+1. **Clone the repository.**
+2. **Install dependencies**:
+   ```bash
+   flutter pub get
+   ```
+3. **Generate App Icon & Splash Screen**:
+   Place your desired icon image at `assets/icon.png`, then run:
+   ```bash
+   flutter pub run flutter_launcher_icons
+   flutter pub run flutter_native_splash:create
+   ```
+4. **Run the App**:
+   ```bash
+   flutter run
+   ```
 
-- Flutter SDK 3.12.2 or higher.
-- Android Studio or VS Code.
-- A physical device or emulator for testing.
+## Build Instructions (Release)
+- **Android**: `flutter build apk --release` or `flutter build appbundle --release`
+- **iOS**: `flutter build ipa`
 
-### Installation
+## Permissions
+Prayerly requires two permissions to function properly:
+- **Location**: To calculate accurate prayer times using the `adhan` library.
+- **Notifications**: To schedule local alarms when prayer times occur.
 
-1. Clone the repository:
+## Troubleshooting
+If `flutter analyze` shows any minor warnings regarding missing assets, ensure you've placed `icon.png` in the `assets/` directory.
 
-```bash
-git clone <repository-url>
-cd prayerly_app
-```
-
-2. Install dependencies:
-
-```bash
-flutter pub get
-```
-
-3. Run the application:
-
-```bash
-flutter run
-```
-
-## 🛠️ Tech Stack
-
-- **Language**: Dart
-- **Framework**: Flutter
-- **State Management**: Riverpod
-- **Database**: Hive
-- **Location**: Geolocator
-- **Notifications**: Adhan
-
-## 📄 License
-
-This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
+---
+_Keep it simple. Keep it Prayerly._

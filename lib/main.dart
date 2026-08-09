@@ -7,6 +7,7 @@ import 'app/theme.dart';
 import 'core/providers.dart';
 import 'core/localization/app_localizations.dart';
 import 'screens/main_screen.dart';
+import 'screens/onboarding_screen.dart';
 import 'services/hive_service.dart';
 import 'services/notification_service.dart';
 
@@ -26,7 +27,12 @@ void main() async {
   // Initialize Notifications
   final notificationService = NotificationService();
   await notificationService.init();
-  await notificationService.requestPermissions();
+
+  bool isFirstLaunch = sharedPreferences.getBool('isFirstLaunch') ?? hiveService.getAllRecords().isEmpty;
+
+  if (!isFirstLaunch) {
+    await notificationService.requestPermissions();
+  }
 
   runApp(
     ProviderScope(
@@ -35,13 +41,14 @@ void main() async {
         hiveServiceProvider.overrideWithValue(hiveService),
         notificationServiceProvider.overrideWithValue(notificationService),
       ],
-      child: const PrayerlyApp(),
+      child: PrayerlyApp(isFirstLaunch: isFirstLaunch),
     ),
   );
 }
 
 class PrayerlyApp extends ConsumerWidget {
-  const PrayerlyApp({super.key});
+  final bool isFirstLaunch;
+  const PrayerlyApp({super.key, required this.isFirstLaunch});
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
@@ -82,7 +89,7 @@ class PrayerlyApp extends ConsumerWidget {
         GlobalWidgetsLocalizations.delegate,
         GlobalCupertinoLocalizations.delegate,
       ],
-      home: const MainScreen(),
+      home: isFirstLaunch ? const OnboardingScreen() : const MainScreen(),
     );
   }
 }

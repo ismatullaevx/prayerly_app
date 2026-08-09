@@ -19,44 +19,41 @@ class PrayerCard extends StatelessWidget {
     final loc = AppLocalizations.of(context);
     final String prayerName = loc.get(prayer.name.toLowerCase());
 
-    return Card(
-      margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-      child: InkWell(
-        onTap: onTap,
-        borderRadius: BorderRadius.circular(12),
-        child: Padding(
-          padding: const EdgeInsets.all(16.0),
-          child: Row(
-            children: [
-              Expanded(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(
-                      prayerName,
-                      style: const TextStyle(
-                        fontSize: 18,
-                        fontWeight: FontWeight.w600,
-                      ),
-                    ),
-                    const SizedBox(height: 4),
-                    Text(
-                      prayer.time,
-                      style: TextStyle(
-                        fontSize: 14,
-                        color: Theme.of(context).textTheme.bodySmall?.color,
-                      ),
-                    ),
-                  ],
+    return InkWell(
+      onTap: onTap,
+      child: Padding(
+        padding: const EdgeInsets.symmetric(horizontal: 24.0, vertical: 12.0),
+        child: Row(
+          children: [
+            Expanded(
+              flex: 2,
+              child: Text(
+                prayerName,
+                style: TextStyle(
+                  fontSize: 16,
+                  fontWeight: isCompleted ? FontWeight.normal : FontWeight.w600,
+                  color: isCompleted ? Colors.grey : Theme.of(context).textTheme.bodyLarge?.color,
                 ),
               ),
-              Icon(
-                isCompleted ? Icons.check_circle : Icons.radio_button_unchecked,
-                color: isCompleted ? Theme.of(context).primaryColor : Colors.grey,
-                size: 28,
+            ),
+            Expanded(
+              flex: 1,
+              child: Text(
+                prayer.time,
+                style: TextStyle(
+                  fontSize: 16,
+                  fontWeight: isCompleted ? FontWeight.normal : FontWeight.w500,
+                  color: isCompleted ? Colors.grey : Theme.of(context).textTheme.bodyLarge?.color,
+                ),
+                textAlign: TextAlign.left,
               ),
-            ],
-          ),
+            ),
+            Icon(
+              isCompleted ? Icons.check_circle : Icons.radio_button_unchecked,
+              color: isCompleted ? Theme.of(context).primaryColor : Colors.grey.shade400,
+              size: 24,
+            ),
+          ],
         ),
       ),
     );
