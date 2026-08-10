@@ -2,8 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../core/providers.dart';
 import '../../core/localization/app_localizations.dart';
-import 'package:geolocator/geolocator.dart';
-
 class SettingsScreen extends ConsumerWidget {
   const SettingsScreen({super.key});
 
@@ -11,7 +9,6 @@ class SettingsScreen extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final currentTheme = ref.watch(themeProvider);
     final currentLanguage = ref.watch(languageProvider);
-    final locationState = ref.watch(locationNotifierProvider);
     final loc = AppLocalizations.of(context);
 
     return Scaffold(
@@ -88,26 +85,6 @@ class SettingsScreen extends ConsumerWidget {
               ),
             ),
           ),
-          
-          const SizedBox(height: 32),
-          
-          // PRAYER SECTION
-          _buildCategoryHeader(loc.get('prayer'), context),
-          _buildSettingsSection(
-            title: loc.get('location'),
-            child: Card(
-              margin: EdgeInsets.zero,
-              child: ListTile(
-                title: Text(locationState.isLoading 
-                  ? '...'
-                  : (locationState.cityName ?? locationState.errorMessage ?? loc.get('unknownLocation'))),
-                trailing: locationState.errorMessage != null && locationState.errorMessage!.contains('permanently denied') 
-                  ? IconButton(icon: const Icon(Icons.settings), onPressed: () => Geolocator.openAppSettings())
-                  : IconButton(icon: const Icon(Icons.refresh), onPressed: () => ref.read(locationNotifierProvider.notifier).refreshLocation()),
-              ),
-            ),
-          ),
-          
           const SizedBox(height: 32),
 
           // NOTIFICATIONS SECTION
@@ -145,7 +122,6 @@ class SettingsScreen extends ConsumerWidget {
               },
             ),
           ),
-          const SizedBox(height: 32),
         ],
       ),
     );

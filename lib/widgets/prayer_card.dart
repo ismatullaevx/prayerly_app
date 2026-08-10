@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import '../models/prayer.dart';
 import '../core/localization/app_localizations.dart';
 
@@ -20,7 +21,11 @@ class PrayerCard extends StatelessWidget {
     final String prayerName = loc.get(prayer.name.toLowerCase());
 
     return InkWell(
-      onTap: isCompleted ? null : onTap,
+      onTap: isCompleted ? null : () {
+        SystemSound.play(SystemSoundType.click);
+        HapticFeedback.lightImpact();
+        onTap();
+      },
       child: Padding(
         padding: const EdgeInsets.symmetric(horizontal: 24.0, vertical: 12.0),
         child: Row(
@@ -38,17 +43,9 @@ class PrayerCard extends StatelessWidget {
             ),
             Expanded(
               flex: 1,
-              child: Text(
-                prayer.time,
-                style: TextStyle(
-                  fontSize: 16,
-                  fontWeight: isCompleted ? FontWeight.normal : FontWeight.w500,
-                  color: isCompleted ? Colors.grey : Theme.of(context).textTheme.bodyLarge?.color,
-                ),
-                textAlign: TextAlign.left,
-              ),
-            ),
-            TweenAnimationBuilder<double>(
+              child: Align(
+                alignment: Alignment.centerRight,
+                child: TweenAnimationBuilder<double>(
               duration: const Duration(milliseconds: 300),
               curve: Curves.easeOutBack,
               tween: Tween<double>(
@@ -67,6 +64,8 @@ class PrayerCard extends StatelessWidget {
                   ),
                 );
               },
+            ),
+              ),
             ),
           ],
         ),

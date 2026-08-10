@@ -6,7 +6,6 @@ import '../../core/providers.dart';
 import '../../core/localization/app_localizations.dart';
 import '../../widgets/prayer_card.dart';
 import '../../models/prayer.dart';
-import '../../core/next_prayer_provider.dart';
 
 class HomeScreen extends ConsumerWidget {
   const HomeScreen({super.key});
@@ -26,7 +25,6 @@ class HomeScreen extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final dailyPrayers = ref.watch(dailyPrayersProvider);
     final todayRecord = ref.watch(todayRecordProvider);
-    final nextPrayerInfo = ref.watch(nextPrayerProvider);
     final loc = AppLocalizations.of(context);
     final locale = Localizations.localeOf(context).languageCode;
 
@@ -65,44 +63,7 @@ class HomeScreen extends ConsumerWidget {
                 ),
                 const SizedBox(height: 32),
 
-                // Next Prayer Section
-                Text(
-                  loc.get('nextPrayer').toUpperCase(),
-                  style: TextStyle(
-                    fontSize: 12,
-                    fontWeight: FontWeight.w600,
-                    color: Colors.grey.shade600,
-                    letterSpacing: 1.2,
-                  ),
-                ),
-                const SizedBox(height: 12),
-                if (nextPrayerInfo.prayer != null) ...[
-                  Text(
-                    '${loc.get(nextPrayerInfo.prayer!.name.toLowerCase())}${nextPrayerInfo.isTomorrow ? ' (${loc.get('tomorrow')})' : ''}',
-                    style: const TextStyle(
-                      fontSize: 32,
-                      fontWeight: FontWeight.bold,
-                    ),
-                  ),
-                  Text(
-                    nextPrayerInfo.prayer!.time,
-                    style: const TextStyle(
-                      fontSize: 24,
-                      fontWeight: FontWeight.w500,
-                    ),
-                  ),
-                  const SizedBox(height: 4),
-                  Text(
-                    '${nextPrayerInfo.remaining.inHours}h ${nextPrayerInfo.remaining.inMinutes.remainder(60)}m ${loc.get('remaining')}',
-                    style: TextStyle(
-                      fontSize: 16,
-                      color: Theme.of(context).primaryColor,
-                      fontWeight: FontWeight.w500,
-                    ),
-                  ),
-                ],
-                
-                const SizedBox(height: 48),
+                const SizedBox(height: 32),
 
                 // Today's Prayers List
                 Text(

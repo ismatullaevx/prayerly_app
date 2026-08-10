@@ -26,6 +26,10 @@ class HiveService {
     return _box.values.toList()..sort((a, b) => b.date.compareTo(a.date));
   }
 
+  Future<void> clearAllData() async {
+    await _box.clear();
+  }
+
   String _generateId(DateTime date) {
     return '${date.year}-${date.month.toString().padLeft(2, '0')}-${date.day.toString().padLeft(2, '0')}';
   }
