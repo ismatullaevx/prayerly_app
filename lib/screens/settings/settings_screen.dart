@@ -12,8 +12,6 @@ class SettingsScreen extends ConsumerWidget {
     final currentTheme = ref.watch(themeProvider);
     final currentLanguage = ref.watch(languageProvider);
     final locationState = ref.watch(locationNotifierProvider);
-    final calcMethod = ref.watch(calculationMethodProvider);
-    final madhab = ref.watch(madhabProvider);
     final loc = AppLocalizations.of(context);
 
     return Scaffold(
@@ -106,57 +104,6 @@ class SettingsScreen extends ConsumerWidget {
                 trailing: locationState.errorMessage != null && locationState.errorMessage!.contains('permanently denied') 
                   ? IconButton(icon: const Icon(Icons.settings), onPressed: () => Geolocator.openAppSettings())
                   : IconButton(icon: const Icon(Icons.refresh), onPressed: () => ref.read(locationNotifierProvider.notifier).refreshLocation()),
-              ),
-            ),
-          ),
-          const SizedBox(height: 16),
-          _buildSettingsSection(
-            title: loc.get('calculationMethod'),
-            child: Card(
-              margin: EdgeInsets.zero,
-              child: Column(
-                children: [
-                  for (var method in ['muslim_world_league', 'egyptian', 'karachi', 'umm_al_qura', 'dubai', 'moonsighting_committee'])
-                    ...[
-                      RadioListTile<String>(
-                        title: Text(loc.get(method)),
-                        value: method,
-                        groupValue: calcMethod,
-                        onChanged: (value) {
-                          if (value != null) ref.read(calculationMethodProvider.notifier).setMethod(value);
-                        },
-                      ),
-                      if (method != 'moonsighting_committee') const Divider(height: 1),
-                    ]
-                ],
-              ),
-            ),
-          ),
-          const SizedBox(height: 16),
-          _buildSettingsSection(
-            title: loc.get('madhab'),
-            child: Card(
-              margin: EdgeInsets.zero,
-              child: Column(
-                children: [
-                  RadioListTile<String>(
-                    title: Text(loc.get('shafi')),
-                    value: 'shafi',
-                    groupValue: madhab,
-                    onChanged: (value) {
-                      if (value != null) ref.read(madhabProvider.notifier).setMadhab(value);
-                    },
-                  ),
-                  const Divider(height: 1),
-                  RadioListTile<String>(
-                    title: Text(loc.get('hanafi')),
-                    value: 'hanafi',
-                    groupValue: madhab,
-                    onChanged: (value) {
-                      if (value != null) ref.read(madhabProvider.notifier).setMadhab(value);
-                    },
-                  ),
-                ],
               ),
             ),
           ),

@@ -12,6 +12,7 @@ class NotificationService {
   bool _isInitialized = false;
 
   Future<void> init() async {
+    if (Platform.isWindows || Platform.isLinux) return;
     if (_isInitialized) return;
 
     tz.initializeTimeZones();
@@ -36,6 +37,7 @@ class NotificationService {
   }
 
   Future<void> requestPermissions() async {
+    if (Platform.isWindows || Platform.isLinux) return;
     if (Platform.isIOS) {
       await flutterLocalNotificationsPlugin
           .resolvePlatformSpecificImplementation<
@@ -70,6 +72,7 @@ class NotificationService {
   }
 
   Future<void> cancelAllNotifications() async {
+    if (Platform.isWindows || Platform.isLinux) return;
     await flutterLocalNotificationsPlugin.cancelAll();
   }
 
@@ -78,6 +81,8 @@ class NotificationService {
       bool notificationsEnabled, 
       Map<String, bool> individualSettings,
       String Function(String) getTranslation) async {
+    
+    if (Platform.isWindows || Platform.isLinux) return;
     
     await cancelAllNotifications();
 

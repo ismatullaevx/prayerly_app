@@ -78,7 +78,7 @@ class HomeScreen extends ConsumerWidget {
                 const SizedBox(height: 12),
                 if (nextPrayerInfo.prayer != null) ...[
                   Text(
-                    '${loc.get(nextPrayerInfo.prayer!.name.toLowerCase())}${nextPrayerInfo.isTomorrow ? ' (${loc.get('tomorrow') ?? 'Tomorrow'})' : ''}',
+                    '${loc.get(nextPrayerInfo.prayer!.name.toLowerCase())}${nextPrayerInfo.isTomorrow ? ' (${loc.get('tomorrow')})' : ''}',
                     style: const TextStyle(
                       fontSize: 32,
                       fontWeight: FontWeight.bold,

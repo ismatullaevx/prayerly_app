@@ -67,35 +67,7 @@ final languageProvider = StateNotifierProvider<LanguageNotifier, String>((ref) {
   return LanguageNotifier(ref.watch(storageServiceProvider));
 });
 
-class CalculationMethodNotifier extends StateNotifier<String> {
-  final StorageService _storageService;
 
-  CalculationMethodNotifier(this._storageService) : super(_storageService.getCalculationMethod());
-
-  void setMethod(String method) {
-    state = method;
-    _storageService.saveCalculationMethod(method);
-  }
-}
-
-final calculationMethodProvider = StateNotifierProvider<CalculationMethodNotifier, String>((ref) {
-  return CalculationMethodNotifier(ref.watch(storageServiceProvider));
-});
-
-class MadhabNotifier extends StateNotifier<String> {
-  final StorageService _storageService;
-
-  MadhabNotifier(this._storageService) : super(_storageService.getMadhab());
-
-  void setMadhab(String madhab) {
-    state = madhab;
-    _storageService.saveMadhab(madhab);
-  }
-}
-
-final madhabProvider = StateNotifierProvider<MadhabNotifier, String>((ref) {
-  return MadhabNotifier(ref.watch(storageServiceProvider));
-});
 
 class LocationState {
   final double? latitude;
@@ -158,18 +130,15 @@ final locationNotifierProvider = StateNotifierProvider<LocationNotifier, Locatio
 // Providers for prayer data
 final dailyPrayersProvider = FutureProvider<List<Prayer>>((ref) async {
   final locationState = ref.watch(locationNotifierProvider);
-  final calcMethod = ref.watch(calculationMethodProvider);
-  final madhabStr = ref.watch(madhabProvider);
   final realPrayerService = ref.watch(realPrayerServiceProvider);
-  final mockService = ref.watch(mockPrayerServiceProvider);
 
   if (locationState.latitude != null && locationState.longitude != null) {
     try {
       return realPrayerService.calculatePrayers(
         locationState.latitude!, 
         locationState.longitude!,
-        calcMethod,
-        madhabStr,
+        'muslim_world_league', // Hardcoded default
+        'shafi', // Hardcoded default
       );
     } catch (e) {
       throw Exception('Unable to get prayer times');
@@ -187,9 +156,8 @@ final dailyPrayersProvider = FutureProvider<List<Prayer>>((ref) async {
 
 class TodayRecordNotifier extends StateNotifier<PrayerRecord> {
   final HiveService _hiveService;
-  final DateTime _today;
 
-  TodayRecordNotifier(this._hiveService) : _today = DateTime.now(), super(_initRecord(_hiveService));
+  TodayRecordNotifier(this._hiveService) : super(_initRecord(_hiveService));
 
   static PrayerRecord _initRecord(HiveService hiveService) {
     final now = DateTime.now();
@@ -198,14 +166,15 @@ class TodayRecordNotifier extends StateNotifier<PrayerRecord> {
   }
 
   void togglePrayer(PrayerType type) {
+    // Only allow setting to true, not false (one-way toggle)
     final updatedRecord = PrayerRecord(
       id: state.id,
       date: state.date,
-      isFajrCompleted: type == PrayerType.fajr ? !state.isFajrCompleted : state.isFajrCompleted,
-      isDhuhrCompleted: type == PrayerType.dhuhr ? !state.isDhuhrCompleted : state.isDhuhrCompleted,
-      isAsrCompleted: type == PrayerType.asr ? !state.isAsrCompleted : state.isAsrCompleted,
-      isMaghribCompleted: type == PrayerType.maghrib ? !state.isMaghribCompleted : state.isMaghribCompleted,
-      isIshaCompleted: type == PrayerType.isha ? !state.isIshaCompleted : state.isIshaCompleted,
+      isFajrCompleted: type == PrayerType.fajr ? true : state.isFajrCompleted,
+      isDhuhrCompleted: type == PrayerType.dhuhr ? true : state.isDhuhrCompleted,
+      isAsrCompleted: type == PrayerType.asr ? true : state.isAsrCompleted,
+      isMaghribCompleted: type == PrayerType.maghrib ? true : state.isMaghribCompleted,
+      isIshaCompleted: type == PrayerType.isha ? true : state.isIshaCompleted,
     );
     state = updatedRecord;
     _hiveService.saveRecord(updatedRecord);

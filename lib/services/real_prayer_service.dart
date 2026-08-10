@@ -22,7 +22,7 @@ class RealPrayerService {
           method = adhan.CalculationMethod.dubai;
           break;
         case 'moonsighting_committee':
-          method = adhan.CalculationMethod.moonsighting_committee;
+          method = adhan.CalculationMethod.moon_sighting_committee;
           break;
         case 'muslim_world_league':
         default:
