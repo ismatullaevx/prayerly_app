@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:intl/intl.dart';
 import '../../core/providers.dart';
+import '../../core/next_prayer_provider.dart';
 import '../../core/localization/app_localizations.dart';
 import '../../widgets/prayer_card.dart';
 import '../../models/prayer.dart';
@@ -21,10 +22,168 @@ class HomeScreen extends ConsumerWidget {
     }
   }
 
+  String _formatRemaining(Duration duration, String remainingLabel, bool isRu) {
+    final hours = duration.inHours;
+    final minutes = duration.inMinutes.remainder(60);
+    final hSuffix = isRu ? 'ч' : 'h';
+    final mSuffix = isRu ? 'м' : 'm';
+    if (hours > 0) {
+      return '$hours$hSuffix $minutes$mSuffix $remainingLabel';
+    }
+    return '$minutes$mSuffix $remainingLabel';
+  }
+
+  Widget _buildHeroBanner(
+    BuildContext context,
+    AppLocalizations loc,
+    String locale,
+    NextPrayerInfo nextPrayerInfo,
+  ) {
+    final hasPrayer = nextPrayerInfo.prayer != null;
+    final prayerName = hasPrayer
+        ? '${loc.get(nextPrayerInfo.prayer!.type.name)}${nextPrayerInfo.isTomorrow ? ' (${loc.get('tomorrow')})' : ''}'
+        : loc.get('completedForToday');
+
+    return Container(
+      margin: const EdgeInsets.only(top: 8.0, bottom: 28.0),
+      decoration: BoxDecoration(
+        borderRadius: BorderRadius.circular(24.0),
+        gradient: const LinearGradient(
+          colors: [Color(0xFF0F3E3B), Color(0xFF072422)],
+          begin: Alignment.topLeft,
+          end: Alignment.bottomRight,
+        ),
+        boxShadow: [
+          BoxShadow(
+            color: const Color(0xFF0F3E3B).withValues(alpha: 0.35),
+            blurRadius: 20,
+            offset: const Offset(0, 10),
+          ),
+        ],
+      ),
+      child: ClipRRect(
+        borderRadius: BorderRadius.circular(24.0),
+        child: Stack(
+          children: [
+            // Background artwork using the icon image
+            Positioned(
+              right: -15,
+              top: -15,
+              bottom: -15,
+              child: Opacity(
+                opacity: 0.85,
+                child: Image.asset(
+                  'assets/icon.png',
+                  fit: BoxFit.contain,
+                ),
+              ),
+            ),
+            // Gradient overlay for seamless text readability
+            Positioned.fill(
+              child: Container(
+                decoration: BoxDecoration(
+                  gradient: LinearGradient(
+                    colors: [
+                      const Color(0xFF0F3E3B).withValues(alpha: 0.95),
+                      const Color(0xFF0F3E3B).withValues(alpha: 0.72),
+                      Colors.transparent,
+                    ],
+                    stops: const [0.0, 0.58, 1.0],
+                    begin: Alignment.centerLeft,
+                    end: Alignment.centerRight,
+                  ),
+                ),
+              ),
+            ),
+            // Banner Content
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 22.0, vertical: 20.0),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Container(
+                    padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+                    decoration: BoxDecoration(
+                      color: Colors.white.withValues(alpha: 0.15),
+                      borderRadius: BorderRadius.circular(20),
+                    ),
+                    child: Text(
+                      loc.get('nextPrayer').toUpperCase(),
+                      style: const TextStyle(
+                        fontSize: 11,
+                        fontWeight: FontWeight.w600,
+                        color: Color(0xFFE2D6C0),
+                        letterSpacing: 1.2,
+                      ),
+                    ),
+                  ),
+                  const SizedBox(height: 10),
+                  Text(
+                    prayerName,
+                    style: const TextStyle(
+                      fontSize: 28,
+                      fontWeight: FontWeight.bold,
+                      color: Colors.white,
+                      letterSpacing: -0.5,
+                    ),
+                  ),
+                  if (hasPrayer) ...[
+                    const SizedBox(height: 2),
+                    Text(
+                      nextPrayerInfo.prayer!.time,
+                      style: TextStyle(
+                        fontSize: 20,
+                        fontWeight: FontWeight.w600,
+                        color: Colors.white.withValues(alpha: 0.9),
+                      ),
+                    ),
+                    const SizedBox(height: 10),
+                    Container(
+                      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
+                      decoration: BoxDecoration(
+                        color: Colors.black.withValues(alpha: 0.25),
+                        borderRadius: BorderRadius.circular(12),
+                      ),
+                      child: Row(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          const Icon(
+                            Icons.access_time_rounded,
+                            size: 14,
+                            color: Color(0xFFE2D6C0),
+                          ),
+                          const SizedBox(width: 6),
+                          Text(
+                            _formatRemaining(
+                              nextPrayerInfo.remaining,
+                              loc.get('remaining'),
+                              locale == 'ru',
+                            ),
+                            style: const TextStyle(
+                              fontSize: 12,
+                              fontWeight: FontWeight.w500,
+                              color: Color(0xFFE2D6C0),
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ],
+                ],
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final dailyPrayers = ref.watch(dailyPrayersProvider);
     final todayRecord = ref.watch(todayRecordProvider);
+    final nextPrayerInfo = ref.watch(nextPrayerProvider);
     final loc = AppLocalizations.of(context);
     final locale = Localizations.localeOf(context).languageCode;
 
@@ -37,7 +196,22 @@ class HomeScreen extends ConsumerWidget {
 
     return Scaffold(
       appBar: AppBar(
-        title: Text(loc.get('appTitle')),
+        title: Row(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            ClipRRect(
+              borderRadius: BorderRadius.circular(6),
+              child: Image.asset(
+                'assets/icon.png',
+                width: 24,
+                height: 24,
+                fit: BoxFit.cover,
+              ),
+            ),
+            const SizedBox(width: 8),
+            Text(loc.get('appTitle')),
+          ],
+        ),
         centerTitle: true,
       ),
       body: SafeArea(
@@ -61,9 +235,9 @@ class HomeScreen extends ConsumerWidget {
                     color: Colors.grey.shade600,
                   ),
                 ),
-                const SizedBox(height: 32),
-
-                const SizedBox(height: 32),
+                
+                // Hero Banner with icon artwork & Next Prayer
+                _buildHeroBanner(context, loc, locale, nextPrayerInfo),
 
                 // Today's Prayers List
                 Text(

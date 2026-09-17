@@ -48,6 +48,29 @@ class _OnboardingScreenState extends ConsumerState<OnboardingScreen> {
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
               const Spacer(),
+              Center(
+                child: Container(
+                  decoration: BoxDecoration(
+                    borderRadius: BorderRadius.circular(28),
+                    boxShadow: [
+                      BoxShadow(
+                        color: const Color(0xFF0F3E3B).withValues(alpha: 0.25),
+                        blurRadius: 24,
+                        offset: const Offset(0, 12),
+                      ),
+                    ],
+                  ),
+                  child: ClipRRect(
+                    borderRadius: BorderRadius.circular(28),
+                    child: Image.asset(
+                      'assets/icon.png',
+                      width: 120,
+                      height: 120,
+                    ),
+                  ),
+                ),
+              ),
+              const SizedBox(height: 32),
               Text(
                 loc.get('appTitle'),
                 style: const TextStyle(
