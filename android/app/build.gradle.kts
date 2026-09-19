@@ -5,7 +5,7 @@ plugins {
 
 android {
     namespace = "com.example.prayerly_app"
-    compileSdk = 37
+    compileSdk = flutter.compileSdkVersion
     ndkVersion = flutter.ndkVersion
 
     compileOptions {
